@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>TAM Karaoke Night – Temple of Art & Music</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #04051a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    font-family: Georgia, 'Times New Roman', serif;
+    padding: 1rem;
+  }
+
+  .app {
+    width: 100%;
+    max-width: 520px;
+    min-height: 680px;
+    background: #07082b;
+    border-radius: 20px;
+    border: 1px solid rgba(255,215,0,0.2);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    color: #fff;
+    box-shadow: 0 0 60px rgba(255,215,0,0.06);
+  }
+
+  /* ── Floating background songs ── */
+  .bg-layer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+
+  .song-float {
+    position: absolute;
+    white-space: nowrap;
+    animation: rise linear infinite;
+    will-change: transform;
+  }
+
+  @keyframes rise {
+    0%   { transform: translateY(720px); opacity: 0; }
+    6%   { opacity: 1; }
+    88%  { opacity: 0.7; }
+    100% { transform: translateY(-60px); opacity: 0; }
+  }
+
+  /* ── Support banner ── */
+  .banner {
+    background: #110938;
+    border-bottom: 1px solid rgba(255,215,0,0.28);
+    padding: 10px 20px;
+    font-size: 11.5px;
+    color: rgba(255,215,0,0.82);
+    text-align: center;
+    z-index: 10;
+    position: relative;
+    line-height: 1.65;
+  }
+
+  /* ── Main content area ── */
+  .main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1.75rem 1.5rem 1.25rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ── Logo ── */
+  .logo { text-align: center; margin-bottom: 1.25rem; }
+  .logo-text {
+    display: block;
+    font-size: 50px;
+    font-weight: bold;
+    color: #FFD700;
+    letter-spacing: 12px;
+    line-height: 1;
+  }
+  .logo-sub {
+    display: block;
+    font-size: 10.5px;
+    color: rgba(0,206,209,0.85);
+    letter-spacing: 3.5px;
+    text-transform: uppercase;
+    margin-top: 5px;
+  }
+
+  /* ── Step dots ── */
+  .steps {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 1.25rem;
+    justify-content: center;
+  }
+  .dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.18);
+    transition: background 0.4s, transform 0.3s;
+  }
+  .dot.active {
+    background: #FFD700;
+    transform: scale(1.25);
+  }
+
+  /* ── Card ── */
+  .card {
+    background: rgba(255,255,255,0.055);
+    border: 1px solid rgba(255,215,0,0.22);
+    border-radius: 14px;
+    padding: 1.65rem 1.5rem;
+    width: 100%;
+    max-width: 420px;
+  }
+
+  .ctitle {
+    font-size: 19px;
+    color: #FFD700;
+    text-align: center;
+    margin-bottom: 5px;
+  }
+  .csub {
+    font-size: 13px;
+    color: rgba(255,255,255,0.55);
+    text-align: center;
+    margin-bottom: 1.35rem;
+    line-height: 1.65;
+  }
+
+  /* ── Form fields ── */
+  .field { margin-bottom: 0.9rem; }
+  .field label {
+    display: block;
+    font-size: 11px;
+    color: rgba(0,206,209,0.85);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+    font-family: Georgia, serif;
+  }
+  .field input {
+    width: 100%;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,215,0,0.28);
+    border-radius: 8px;
+    padding: 10px 13px;
+    font-size: 14.5px;
+    color: #fff;
+    font-family: Georgia, serif;
+    outline: none;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .field input:focus {
+    border-color: rgba(255,215,0,0.65);
+    background: rgba(255,255,255,0.11);
+  }
+  .field input::placeholder { color: rgba(255,255,255,0.28); }
+
+  .err {
+    color: #ff7c7c;
+    font-size: 11.5px;
+    margin-top: 4px;
+    display: none;
+  }
+
+  /* ── Buttons ── */
+  .btn-g {
+    width: 100%;
+    background: #FFD700;
+    color: #07082b;
+    border: none;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 15px;
+    font-weight: bold;
+    font-family: Georgia, serif;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    transition: background 0.2s, transform 0.15s;
+    margin-top: 6px;
+  }
+  .btn-g:hover { background: #FFE94D; transform: translateY(-1px); }
+  .btn-g:active { transform: scale(0.98); }
+
+  .btn-o {
+    width: 100%;
+    background: transparent;
+    color: rgba(0,206,209,0.85);
+    border: 1px solid rgba(0,206,209,0.35);
+    border-radius: 8px;
+    padding: 9px;
+    font-size: 13.5px;
+    font-family: Georgia, serif;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: background 0.2s;
+  }
+  .btn-o:hover { background: rgba(0,206,209,0.08); }
+
+  /* ── Screen management ── */
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* ── Big icon ── */
+  .big-icon { text-align: center; font-size: 38px; margin-bottom: 0.75rem; }
+
+  /* ── Drink hints ── */
+  .drink-hint {
+    font-size: 11px;
+    color: rgba(255,215,0,0.42);
+    text-align: center;
+    margin-top: -0.6rem;
+    margin-bottom: 0.9rem;
+    line-height: 1.6;
+  }
+
+  /* ── Summary box ── */
+  .summary-box {
+    margin: 0.85rem 0;
+    padding: 12px 14px;
+    background: rgba(255,215,0,0.07);
+    border-radius: 9px;
+    border: 1px solid rgba(255,215,0,0.18);
+  }
+  .sum-label {
+    font-size: 11px;
+    color: rgba(255,255,255,0.38);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+  }
+  .sum-name { font-size: 17px; color: #FFD700; margin-bottom: 2px; }
+  .sum-song { font-size: 13.5px; color: rgba(255,255,255,0.75); }
+
+  /* ── Confirm note ── */
+  .confirm-note {
+    background: rgba(0,206,209,0.08);
+    border: 1px solid rgba(0,206,209,0.2);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 12.5px;
+    color: rgba(0,206,209,0.8);
+    text-align: center;
+    margin-bottom: 0.85rem;
+    line-height: 1.55;
+  }
+
+  .note {
+    font-size: 11px;
+    color: rgba(255,255,255,0.32);
+    text-align: center;
+    margin-top: 6px;
+    line-height: 1.55;
+  }
+
+  /* ── Final song display ── */
+  .final-song {
+    font-size: 20px;
+    color: #FFD700;
+    text-align: center;
+    margin: 0.85rem 0;
+    line-height: 1.4;
+  }
+
+  .divider {
+    height: 1px;
+    background: rgba(255,215,0,0.12);
+    margin: 0.85rem 0;
+  }
+
+  /* ── Ticker ── */
+  .ticker-wrap {
+    width: 100%;
+    overflow: hidden;
+    border-top: 1px solid rgba(255,215,0,0.12);
+    padding: 8px 0 10px;
+    position: relative;
+    z-index: 2;
+  }
+  .ticker-label {
+    font-size: 9.5px;
+    color: rgba(0,206,209,0.45);
+    letter-spacing: 2.5px;
+    text-align: center;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+  }
+  .ticker {
+    display: flex;
+    gap: 28px;
+    animation: tick 32s linear infinite;
+    white-space: nowrap;
+  }
+  .ticker-item {
+    font-size: 11.5px;
+    color: rgba(255,215,0,0.45);
+    flex-shrink: 0;
+  }
+  @keyframes tick {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+</style>
+</head>
+<body>
+
+<div class="app" id="app">
+
+  <!-- Support banner -->
+  <div class="banner">
+    🎵 Your support of the TAM bar helps to save live music &nbsp;·&nbsp;
+    Please respect the Temple and do not bring outside drinks from other Mercato vendors — this does not support the TAM
+  </div>
+
+  <!-- Floating background songs -->
+  <div class="bg-layer" id="bgLayer"></div>
+
+  <!-- Main -->
+  <div class="main">
+
+    <div class="logo">
+      <span class="logo-text">TAM</span>
+      <span class="logo-sub">Temple of Art &amp; Music &nbsp;·&nbsp; Karaoke Night</span>
+    </div>
+
+    <div class="steps">
+      <div class="dot active" id="d1"></div>
+      <div class="dot" id="d2"></div>
+      <div class="dot" id="d3"></div>
+    </div>
+
+    <!-- Screen 1 – Drink password -->
+    <div class="screen active card" id="s1">
+      <div class="big-icon">🎤</div>
+      <div class="ctitle">Sing for Free Tonight</div>
+      <div class="csub">Purchase any drink from the TAM bar, then enter the drink name below as your password to join the karaoke list.</div>
+      <div class="drink-hint">🍺 Lager &nbsp;·&nbsp; 🥂 Prosecco &nbsp;·&nbsp; 🍸 Gin &amp; Tonic &nbsp;·&nbsp; 🍷 Red Wine &nbsp;·&nbsp; and more at the bar</div>
+      <div class="field">
+        <label>Your drink password</label>
+        <input type="text" id="drinkInput" placeholder="e.g. Estrella, Prosecco, Rum & Coke…" autocomplete="off" />
+        <div class="err" id="drinkErr">Please enter your drink name to continue</div>
+      </div>
+      <button class="btn-g" onclick="step2()">Enter the Temple ✦</button>
+    </div>
+
+    <!-- Screen 2 – Song registration -->
+    <div class="screen card" id="s2">
+      <div class="big-icon">🎼</div>
+      <div class="ctitle">Register Your Song</div>
+      <div class="csub">Fill in your details and the song you'd love to perform</div>
+      <div class="field">
+        <label>Your name</label>
+        <input type="text" id="nameIn" placeholder="Your name" />
+      </div>
+      <div class="field">
+        <label>Your email</label>
+        <input type="email" id="emailIn" placeholder="your@email.com" />
+        <div class="err" id="emailErr">Please enter a valid email address</div>
+      </div>
+      <div class="field">
+        <label>Song title</label>
+        <input type="text" id="songIn" placeholder="e.g. Bohemian Rhapsody" />
+        <div class="err" id="songErr">Please enter a song title</div>
+      </div>
+      <div class="field">
+        <label>Artist</label>
+        <input type="text" id="artistIn" placeholder="e.g. Queen" />
+      </div>
+      <button class="btn-g" onclick="step3()">Request This Song 🎵</button>
+      <button class="btn-o" onclick="setScreen(1)">← Back</button>
+    </div>
+
+    <!-- Screen 3 – Confirm email -->
+    <div class="screen card" id="s3">
+      <div class="big-icon">📬</div>
+      <div class="ctitle">Almost There!</div>
+      <div class="confirm-note" id="confirmNote">Is this the right address? Confirm below and our host will be notified immediately.</div>
+      <div class="summary-box">
+        <div class="sum-label">Your request</div>
+        <div class="sum-name" id="sumName"></div>
+        <div class="sum-song" id="sumSong"></div>
+      </div>
+      <button class="btn-g" onclick="confirm3()">✓ Yes — That's My Email, Confirm!</button>
+      <div class="note">Confirming will open your email app to notify our karaoke host at TAM</div>
+      <button class="btn-o" onclick="setScreen(2)">← Edit My Details</button>
+    </div>
+
+    <!-- Screen 4 – Done -->
+    <div class="screen card" id="s4">
+      <div class="big-icon">🌟</div>
+      <div class="ctitle">You're On The List!</div>
+      <div class="csub" id="finalMsg"></div>
+      <div class="final-song" id="finalSong"></div>
+      <div class="divider"></div>
+      <div style="font-size:12.5px;color:rgba(255,255,255,0.42);text-align:center;line-height:1.75;margin-bottom:0.9rem">
+        Grab your drink, find your spot, and listen for your name.<br>
+        The Temple thanks you for your support. 🙏
+      </div>
+      <button class="btn-o" onclick="resetAll()">+ Register Another Singer</button>
+    </div>
+
+  </div><!-- /main -->
+
+  <!-- Ticker -->
+  <div class="ticker-wrap">
+    <div class="ticker-label">♪ Tonight's most requested songs</div>
+    <div class="ticker" id="ticker"></div>
+  </div>
+
+</div><!-- /app -->
+
+<script>
+var SONGS = [
+  "Bohemian Rhapsody – Queen",
+  "Don't Stop Believin' – Journey",
+  "Total Eclipse of the Heart – Bonnie Tyler",
+  "I Will Always Love You – Whitney Houston",
+  "Sweet Caroline – Neil Diamond",
+  "Livin' on a Prayer – Bon Jovi",
+  "Mr. Brightside – The Killers",
+  "Dancing Queen – ABBA",
+  "Africa – Toto",
+  "Shallow – Lady Gaga",
+  "Jolene – Dolly Parton",
+  "Angels – Robbie Williams",
+  "Purple Rain – Prince",
+  "My Way – Frank Sinatra",
+  "Piano Man – Billy Joel",
+  "Wonderwall – Oasis",
+  "Stand By Me – Ben E. King",
+  "Killing Me Softly – Fugees",
+  "Since U Been Gone – Kelly Clarkson",
+  "Roxanne – The Police",
+  "Uptown Funk – Bruno Mars",
+  "Hallelujah – Jeff Buckley",
+  "Don't You Want Me – Human League",
+  "Gold – Spandau Ballet",
+  "Take On Me – A-ha",
+  "Waterloo – ABBA",
+  "Hey Jude – The Beatles",
+  "Valerie – Amy Winehouse",
+  "Superstition – Stevie Wonder",
+  "Ring of Fire – Johnny Cash"
+];
+
+var sessionRequests = [];
+var cur = {};
+
+/* ── Build floating background ── */
+var bgLayer = document.getElementById('bgLayer');
+SONGS.forEach(function(s) {
+  var el = document.createElement('div');
+  el.className = 'song-float';
+  el.textContent = '♪ ' + s;
+  el.style.left     = (Math.random() * 88) + '%';
+  el.style.fontSize = (10 + Math.random() * 5) + 'px';
+  el.style.color    = 'rgba(255,215,0,' + (0.07 + Math.random() * 0.13) + ')';
+  el.style.animationDuration = (15 + Math.random() * 18) + 's';
+  el.style.animationDelay   = (-Math.random() * 24) + 's';
+  bgLayer.appendChild(el);
+});
+
+/* ── Build ticker ── */
+function buildTicker() {
+  var t = document.getElementById('ticker');
+  t.innerHTML = '';
+  var list = sessionRequests.length
+    ? sessionRequests.concat(SONGS)
+    : SONGS;
+  list.concat(list).forEach(function(s) {
+    var sp = document.createElement('span');
+    sp.className = 'ticker-item';
+    sp.textContent = '♪  ' + s;
+    t.appendChild(sp);
+  });
+}
+buildTicker();
+
+/* ── Screen navigation ── */
+function setScreen(n) {
+  [1,2,3,4].forEach(function(i) {
+    document.getElementById('s' + i).classList.toggle('active', i === n);
+  });
+  [1,2,3].forEach(function(i) {
+    var on = (n === 1 && i === 1) || (n === 2 && i <= 2) || (n >= 3 && i <= 3);
+    document.getElementById('d' + i).classList.toggle('active', on);
+  });
+}
+
+/* ── Step 1 → 2 ── */
+function step2() {
+  var d = document.getElementById('drinkInput').value.trim();
+  if (!d) { document.getElementById('drinkErr').style.display = 'block'; return; }
+  document.getElementById('drinkErr').style.display = 'none';
+  cur.drink = d;
+  setScreen(2);
+}
+
+/* ── Step 2 → 3 ── */
+function step3() {
+  var name   = document.getElementById('nameIn').value.trim();
+  var email  = document.getElementById('emailIn').value.trim();
+  var song   = document.getElementById('songIn').value.trim();
+  var artist = document.getElementById('artistIn').value.trim();
+  var ok = true;
+
+  if (!email || !email.includes('@')) {
+    document.getElementById('emailErr').style.display = 'block'; ok = false;
+  } else {
+    document.getElementById('emailErr').style.display = 'none';
+  }
+  if (!song) {
+    document.getElementById('songErr').style.display = 'block'; ok = false;
+  } else {
+    document.getElementById('songErr').style.display = 'none';
+  }
+  if (!ok) return;
+
+  cur = Object.assign(cur, { name: name || 'Superstar', email: email, song: song, artist: artist });
+
+  document.getElementById('confirmNote').textContent =
+    'Is ' + email + ' the right address? Confirm below and our host will be notified immediately.';
+  document.getElementById('sumName').textContent = cur.name;
+  document.getElementById('sumSong').textContent = '♪  ' + song + (artist ? '  –  ' + artist : '');
+  setScreen(3);
+}
+
+/* ── Step 3 → 4 : open mailto to Vivian ── */
+function confirm3() {
+  var songLine = cur.song + (cur.artist ? ' by ' + cur.artist : '');
+
+  var subject = encodeURIComponent(
+    'TAM Karaoke Request: ' + cur.name + ' wants to sing "' + cur.song + '"'
+  );
+  var body = encodeURIComponent(
+    'New Karaoke Request — TAM, Elephant & Castle\n\n' +
+    'Singer:          ' + cur.name   + '\n' +
+    'Email:           ' + cur.email  + '\n' +
+    'Song:            ' + songLine   + '\n' +
+    'Drink purchased: ' + cur.drink  + '\n\n' +
+    'The singer has confirmed their email and is ready to perform.\n\n' +
+    '— TAM Karaoke System\n' +
+    'Temple of Art & Music · Elephant & Castle, London'
+  );
+
+  window.location.href = 'mailto:vivian2october@gmail.com?subject=' + subject + '&body=' + body;
+
+  /* Add to session requests and refresh ticker */
+  var entry = cur.song + (cur.artist ? ' – ' + cur.artist : '');
+  sessionRequests.unshift(entry);
+  if (sessionRequests.length > 10) sessionRequests.pop();
+  buildTicker();
+
+  document.getElementById('finalMsg').textContent =
+    'Amazing, ' + cur.name + '! Your request is with the host. Get ready to take the stage at the Temple!';
+  document.getElementById('finalSong').textContent =
+    '♪   ' + cur.song + (cur.artist ? '   –   ' + cur.artist : '') + '   ♪';
+
+  setScreen(4);
+}
+
+/* ── Reset ── */
+function resetAll() {
+  cur = {};
+  ['drinkInput','nameIn','emailIn','songIn','artistIn'].forEach(function(id) {
+    document.getElementById(id).value = '';
+  });
+  setScreen(1);
+}
+</script>
+</body>
+</html>
